@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 // Defining a functional component named Create
 function Create() {
@@ -11,6 +12,18 @@ function Create() {
     e.preventDefault();
 
     console.log("Title: " + title + " Author: " + author + " Cover: " + cover);
+
+    //Book array
+    const book = {
+        title : title,
+        cover : cover,
+        author : author
+    }
+
+    axios.post('http://localhost:4000/api/books', book )
+    .then()
+    .catch();
+
    }
 
     return (
