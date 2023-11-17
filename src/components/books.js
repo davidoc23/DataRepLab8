@@ -8,7 +8,7 @@ function Books(props) {
         (book) => {
             // Rendering the BookItem component for each book in the array
             // Passing book data as 'myBook' prop and using 'isbn' as a unique key
-            return <BookItem myBook={book} key={book.isbn}></BookItem>
+            return <BookItem myBook={book} key={book._id}></BookItem>
         }
     );
 }

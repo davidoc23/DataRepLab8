@@ -9,16 +9,16 @@ function BookItem(props) {
             {/* Card component from react-bootstrap */}
             <Card>
                 {/* Displaying the book's title in the Card Header */}
-                <Card.Header>{props.myBook.title}</Card.Header>
+                <Card.Header>{props.myBook.cover}</Card.Header>
 
                 <Card.Body>
                     <blockquote className='blockquote mb-0'>
                         {/* Displaying the book's thumbnail image */}
-                        <img src={props.myBook.thumbnailUrl} alt={props.myBook.title}></img>
+                        <img src={props.myBook.cover}></img>
 
                         <footer>
                             {/* Displaying the first author of the book */}
-                            {props.myBook.authors[0]}
+                            {props.myBook.author}
                         </footer>
                     </blockquote>
                 </Card.Body>

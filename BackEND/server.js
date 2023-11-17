@@ -18,65 +18,77 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false })); // Parse URL-encoded data
 app.use(bodyParser.json()); // Parse JSON data
 
-// Root route that responds with "Hello World!" for a GET request to the root URL ("/")
-app.get('/', (req, res) => 
-{
+// Importing the Mongoose library for MongoDB interaction
+const mongoose = require('mongoose');
+
+// Async function to connect to the MongoDB database
+main().catch(err => console.log(err));
+
+async function main() {
+    // Connecting to the MongoDB database using the provided connection string
+    await mongoose.connect('mongodb+srv://admin:admin@mongodb.cpyhxs1.mongodb.net/MYDB1?retryWrites=true&w=majority');
+
+    // Use the following connection string if your database has authentication enabled
+    await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');
+}
+
+// Defining a Mongoose schema for the 'Davids_Books' collection
+const bookSchema = new mongoose.Schema({
+    title: String,
+    cover: String,
+    author: String
+})
+
+// Creating a Mongoose model based on the defined schema
+const bookModel = mongoose.model('Davids_Books', bookSchema);
+
+// Defining a route that responds with "Hello World!" for a GET request to the root URL ("/")
+app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
 // Route "/api/books" that responds with a personalized message based on JSON data from a POST request
-app.post('/api/books', (req, res) => 
-{
+app.post('/api/books', (req, res) => {
+    // Logging the request body for debugging purposes
     console.log(req.body);
-    res.send('Hello , Data Recieved!');
-});
 
-// Route "/api/books" with a JSON response containing a list of books for a GET request
-app.get('/api/books', (req, res) => 
-{
-    const data = [
-        // Array of book objects
-        // Each object contains book details
-        {
-            "title": "Learn Git in a Month of Lunches",
-            "isbn": "1617292419",
-            "pageCount": 0,
-            "thumbnailUrl":"https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/umali.jpg",
-            "status": "MEAP",
-            "authors": ["Rick Umali"],
-            "categories": []
-        },
-        {
-            "title": "MongoDB in Action, Second Edition",
-            "isbn": "1617291609",
-            "pageCount": 0,
-            "thumbnailUrl":"https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/banker2.jpg",
-            "status": "MEAP",
-            "authors": [
-            "Kyle Banker",
-            "Peter Bakkum",
-            "Tim Hawkins",
-            "Shaun Verch",
-            "Douglas Garrett"
-            ],
-            "categories": []
-        },
-        {
-            "title": "Getting MEAN with Mongo, Express, Angular, and Node",
-            "isbn": "1617292036",
-            "pageCount": 0,
-            "thumbnailUrl":"https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/sholmes.jpg",
-            "status": "MEAP",
-            "authors": ["Simon Holmes"],
-            "categories": []
-        }
-    ];
-    res.json({
-        myBooks: data,
-        "Message": "Hello from server.js",
-        "Status":"Happy"
+    // Creating a new document in the 'Davids_Books' collection using data from the POST request
+    bookModel.create({
+        title: req.body.title,
+        cover: req.body.cover,
+        author: req.body.author
+    })
+    .then(() => {
+        // Sending a success message if the book is created successfully
+        res.send('Hello, Book Created!');
+    })
+    .catch(() => {
+        // Sending an error message if there's an issue creating the book
+        res.send('Hello, Book Not Created!');
     });
 });
+
+
+// Route "/api/books" with a JSON response containing a list of books for a GET request
+app.get('/api/books', async(req, res) => 
+{
+    let books = await bookModel.find({});
+    res.json(books);
+});
+
+// Define a GET request handler for the '/api/books/:id' endpoint
+app.get('/api/book/:id', async (req, res) => {
+
+    // Log the book ID received as a parameter in the request
+    console.log(req.params.id);
+
+    // Use the Mongoose model (assumed to be named 'bookModel') to find a book by its ID
+    let book = await bookModel.findById(req.params.id);
+
+    // Send the found book as a response to the client
+    res.send(book);
+
+})
 
 // Start the Express server and listen on the specified port
 app.listen(port, () => 
