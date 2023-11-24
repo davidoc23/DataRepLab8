@@ -29,7 +29,7 @@ async function main() {
     await mongoose.connect('mongodb+srv://admin:admin@mongodb.cpyhxs1.mongodb.net/MYDB1?retryWrites=true&w=majority');
 
     // Use the following connection string if your database has authentication enabled
-    await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');
+    //await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');
 }
 
 // Defining a Mongoose schema for the 'Davids_Books' collection
@@ -41,6 +41,23 @@ const bookSchema = new mongoose.Schema({
 
 // Creating a Mongoose model based on the defined schema
 const bookModel = mongoose.model('Davids_Books', bookSchema);
+
+// This route handles HTTP PUT requests to update a book with a specific ID
+app.put('/api/book/:id', async (req, res) => {
+    
+    // Log the ID of the book being updated
+    console.log("Update: " + req.params.id);
+
+    // Use Mongoose's findByIdAndUpdate to update the book with the specified ID
+    // req.params.id: the ID of the book to be updated
+    // req.body: the data to be updated, which is expected to be in the request body
+    // { new: true }: returns the updated document instead of the original one
+    let book = await bookModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    // Send the updated book as the response
+    res.send(book);
+});
+
 
 // Defining a route that responds with "Hello World!" for a GET request to the root URL ("/")
 app.get('/', (req, res) => {
